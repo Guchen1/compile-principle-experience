@@ -1,2 +1,3 @@
-ORIGIN IS (100+1,10+1) //hello
-//hello
+ORIGIN IS (100+1,10+1);     
+ORIGIN IS (120+1,10+1);  
+FOR T FROM 1 TO 100 STEP 1 DRAW(T*T,2*T);
