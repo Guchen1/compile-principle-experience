@@ -17,7 +17,7 @@ string subreplace(string resource_str, string sub_str, string new_str);
 string getpython()
 {
     FILE *pf = NULL;
-    pf = _popen("where python", "r");
+    pf = _popen("which python", "r");
     if (NULL == pf)
     {
         printf("open pipe failed");
@@ -31,6 +31,12 @@ string getpython()
     }
     _pclose(pf);
     string a = ret;
+    if (a == "")
+    {
+        cout << "No python found!";
+        cin.get();
+        exit(1);
+    }
     a = a.substr(0, a.find('\n'));
     return a;
 }
