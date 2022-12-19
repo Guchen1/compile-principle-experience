@@ -42,11 +42,11 @@
 %token ERRORN
 %type   EXP FACTOR
 %%
-end:  space YEOF       {return -1;}
+end:  space YEOF       {return 0;}
     | space EOL         {return 0;}
     | space statement SEMICOLON   {std::cout<<"get"<<std::endl;return 1;}
-    | COMMENT EOL  {return 0;}
-    | COMMENT YEOF  {return -1;}
+    | space COMMENT EOL  {return 0;}
+    | space COMMENT YEOF  {return 0;}
     ;
 statement:
       ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space    { originx=stod($7);originy=stod($11);}
