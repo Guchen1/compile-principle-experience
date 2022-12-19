@@ -33,8 +33,9 @@ step      {return STEP;}
 draw      {return DRAW;}
 T       {yylval=yytext;return T;}
 [0-9]+    {yylval=yytext;return NUMBER;}
-\n        {chars++;lines++;return EOL;}
-[ ]     {return SPACE;}
+\n        {return EOL;}
+" "     {return SPACE;}
 <<EOF>>   {return YEOF;}
+
 %%
 

@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <string>
 #include <windows.h>
-#include <mgl2/mgl.h>
+// #include <mgl2/mgl.h>
 using namespace std;
 
 extern int words, chars, lines, a;
@@ -41,8 +41,10 @@ int main()
     int a;
     while ((a = yyparse()) != -1)
     {
+
         if (a == 1 || a == 2)
         {
+            cout << n << endl;
             n++;
         }
         if (a == 2)

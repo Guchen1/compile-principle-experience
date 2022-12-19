@@ -2,6 +2,7 @@
 %{
     #include <string>
     #include <iostream>
+    #include <cmath>
     #include "../src/expoperate.hpp"
     using std::string;
     extern int yylex (void);
@@ -36,46 +37,64 @@
 %token T
 %token SPACE
 %token SEMICOLON
+%token PI
+%token E
+%token ERRORN
 %type   EXP FACTOR
 %%
-end:  YEOF       {return -1;}
-    | EOL      {return 0;}
-    | space      {return 0;}
-    | statement COMMENT EOL  { return 1;}
-    | statement EOL   {return 1;}
+end:  space YEOF       {return -1;}
+    | space EOL         {return 0;}
+    | space statement SEMICOLON   {std::cout<<"get"<<std::endl;return 1;}
     | COMMENT EOL  {return 0;}
-    | statement COMMENT YEOF  {return 2;}
-    | statement YEOF   {return 2;}
     | COMMENT YEOF  {return -1;}
     ;
 statement:
-     ORIGIN space IS space LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON space  { originx=stod($7);originy=stod($11);}
-    |SCALE space IS space LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON space { scalex=stod($7);scaley=stod($11);}
-    |ROT space IS space EXP space SEMICOLON space { rotate=stod($5);}
-    |FOR space T space FROM space EXP space TO space EXP space STEP space EXP space DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space SEMICOLON  space {draw($7,$11,$15,$21,$25);}
+      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space    { originx=stod($7);originy=stod($11);}
+    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space  { scalex=stod($7);scaley=stod($11);}
+    | ROT Nspace IS Nspace EXP space  { rotate=stod($5);}
+    | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  {draw($7,$11,$15,$21,$25);}
     ;
 EXP: FACTOR
     | EXP PLUS FACTOR  {$$=std::to_string(stod($1)+stod($3));}
     | EXP MINUS FACTOR   {$$=std::to_string(stod($1)-stod($3));}
     ;
-FACTOR: NUMBER 
-    | FACTOR  MULTIPLY NUMBER  {$$=std::to_string(stod($1)*stod($3));}
-    | FACTOR DIVIDE NUMBER    {$$=std::to_string(stod($1)/stod($3));}
+FACTOR: pow
+    | FACTOR  MULTIPLY pow  {$$=std::to_string(stod($1)*stod($3));}
+    | FACTOR DIVIDE pow    {$$=std::to_string(stod($1)/stod($3));}
+    ;
+pow: digit
+    | pow POWER digit  {$$=std::to_string(pow(stod($1),stod($3)));}
+    ;
+digit: NUMBER
+    |  MINUS NUMBER  {$$='-'+$2;}
+    |  LPAREN  EXP  RPAREN  {$$=$2;}
     ;
 TEXP: TFACTOR
     | TEXP PLUS TFACTOR  {if($1.find("T")!=-1||$3.find("T")!=-1) $$=$1+"+"+$3; else $$=std::to_string(stod($1)+stod($3));}
     | TEXP MINUS TFACTOR   {if($1.find("T")!=-1||$3.find("T")!=-1) $$=$1+"-"+$3; else $$=std::to_string(stod($1)-stod($3));}
     ;
-TFACTOR: NUMBER|T
-    | TFACTOR MULTIPLY NUMBER  {if($1.find("T")!=-1) $$=$1+"*"+$3; else  $$=std::to_string(stod($1)*stod($3));}
-    | TFACTOR DIVIDE NUMBER    {if($1.find("T")!=-1) $$=$1+"/"+$3; else  $$=std::to_string(stod($1)/stod($3));}
-    | TFACTOR MULTIPLY T       {if($1.find("T")!=-1||$3.find("T")!=-1) $$=$1+"*"+$3; else $$=std::to_string(stod($1)*stod($3));}
-    | TFACTOR DIVIDE T         {if($1.find("T")!=-1||$3.find("T")!=-1) $$=$1+"/"+$3; else $$=std::to_string(stod($1)/stod($3));}
+TFACTOR: Tpow
+    | TFACTOR MULTIPLY Tpow      {if($1.find("T")!=-1||$3.find("T")!=-1) $$=$1+"*"+$3; else $$=std::to_string(stod($1)*stod($3));}
+    | TFACTOR DIVIDE Tpow        {if($1.find("T")!=-1||$3.find("T")!=-1) $$=$1+"/"+$3; else $$=std::to_string(stod($1)/stod($3));}
+    ;
+Tpow: Tdigit
+    | Tpow POWER Tdigit  {if($1.find("T")!=-1||$3.find("T")!=-1)$$=$1+"**"+$3;else $$=std::to_string(pow(stod($1),stod($3)));}
+    ;
+Tdigit: T|NUMBER
+    |  MINUS  NUMBER  {$$='-'+$2;}
+    |  MINUS  T  {$$='-'+$2;}
+    |  LPAREN  TEXP  RPAREN  {$$=$2;}
     ;
 space: 
     | SPACE space
     ;
+Nspace: SPACE space
+    ;
+
 %%
 void yyerror(std::string s){
-    std::cerr<<s<<std::endl;
+
+    std::cout<<"error: "<<s<<std::endl;
+
+
 }
