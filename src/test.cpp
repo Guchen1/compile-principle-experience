@@ -5,7 +5,12 @@
 #include <cstdio>
 #include <string>
 #include <windows.h>
+#include <thread>
+#include <map>
+#include <mutex>
 // #include <mgl2/mgl.h>
+std::mutex some_mutex;
+int process_count = 0;
 using namespace std;
 bool errflag = false;
 extern int words, chars, lines, a;
@@ -42,14 +47,38 @@ string getpython()
     return a;
 }
 const string python = subreplace(getpython().substr(0, getpython().length() - 10), "\\", "/");
+void loop(int num, double i, string d, string e, map<int, pair<double, double>> &m, int &flag)
+{
+    double x = expoperate(subreplace(d, "T", std::to_string(i))).getresult() + originx;
+    double y = expoperate(subreplace(e, "T", std::to_string(i))).getresult() + originy;
+    std::lock_guard<std::mutex> guard(some_mutex);
+    m.insert(pair<int, pair<double, double>>(num, pair<double, double>(x, y)));
+    process_count--;
+}
 void draw(string a, string b, string c, string d, string e)
 {
-
+    map<int, pair<double, double>> m;
+    int num = 0;
+    int flag = 1;
+    cout << "Waiting..." << endl;
     for (double i = stod(a); i <= stod(b); i += stod(c))
     {
-        double x = expoperate(subreplace(d, "T", std::to_string(i))).getresult() + originx;
-        double y = expoperate(subreplace(e, "T", std::to_string(i))).getresult() + originy;
-        std::cout << x << " " << y << std::endl;
+        while (process_count > 50)
+        {
+            Sleep(1);
+        }
+        thread t(loop, num, i, d, e, std::ref(m), std::ref(flag));
+        t.detach();
+        process_count++;
+        num++;
+    }
+    while (m.size() != num)
+    {
+        Sleep(10);
+    }
+    for (auto item : m)
+    {
+        cout << item.second.first << " " << item.second.second << endl;
     }
 }
 string subreplace(string resource_str, string sub_str, string new_str)
