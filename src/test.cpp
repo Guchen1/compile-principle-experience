@@ -33,6 +33,7 @@ string getpython()
     string a = ret;
     if (a == "")
     {
+        system("cls");
         cout << "No python found!";
         cin.get();
         exit(1);
