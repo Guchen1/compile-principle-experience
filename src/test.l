@@ -6,6 +6,8 @@
     #include<iostream>
     #include"type.h"
     extern std::string yylval;
+    extern bool errflag;
+    extern  void yyerror(std::string s);
     int chars=0;
     int words=0;
     int lines=0;
@@ -33,9 +35,9 @@ step      {return STEP;}
 draw      {return DRAW;}
 T       {yylval=yytext;return T;}
 [0-9]+    {yylval=yytext;return NUMBER;}
-\n        {return EOL;}
+\n        {errflag=false;return EOL;}
 " "     {return SPACE;}
-<<EOF>>   {return YEOF;}
-
+<<EOF>>   {return YYEOF;}
+[^ \n(),*-+/0-9]*         {return ERRORN;}
 %%
 

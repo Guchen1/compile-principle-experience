@@ -1,3 +1,5 @@
+%define parse.error verbose
+%define parse.lac full
 %define api.value.type {std::string}
 %{
     #include <string>
@@ -6,11 +8,10 @@
     #include "../src/expoperate.hpp"
     using std::string;
     extern int yylex (void);
+    extern bool errflag;
     extern double originx, originy, rotate, scalex, scaley ;
     extern void draw(string start, string end, string step, string x, string y);
     void yyerror(std::string s);
-    int a;
-    std::string s;
 %}
 %token EOL
 %token  NUMBER
@@ -41,18 +42,17 @@
 %token E
 %token ERRORN
 %type   EXP FACTOR
+
 %%
-end:  space YEOF       {return 0;}
-    | space EOL         {return 0;}
-    | space statement SEMICOLON   {std::cout<<"get"<<std::endl;return 1;}
-    | space COMMENT EOL  {return 0;}
-    | space COMMENT YEOF  {return 0;}
+end:                    {errflag=false;}
+    | statement end  {errflag=false;}
+    | Espace end {}
     ;
 statement:
-      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space    { originx=stod($7);originy=stod($11);}
-    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space  { scalex=stod($7);scaley=stod($11);}
-    | ROT Nspace IS Nspace EXP space  { rotate=stod($5);}
-    | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  {draw($7,$11,$15,$21,$25);}
+      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON   { originx=stod($7);originy=stod($11);std::cout<<"OK,the origin is now ("<<originx<<","<<originy<<")"<<std::endl;}
+    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { scalex=stod($7);scaley=stod($11); std::cout<<"OK,the scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
+    | ROT Nspace IS Nspace EXP space SEMICOLON  { rotate=stod($5); std::cout<<"OK,the rotate is now "<<rotate<<std::endl;}
+    | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  SEMICOLON {draw($7,$11,$15,$21,$25);}
     ;
 EXP: FACTOR
     | EXP PLUS FACTOR  {$$=std::to_string(stod($1)+stod($3));}
@@ -87,14 +87,16 @@ Tdigit: T|NUMBER
     ;
 space: 
     | SPACE space
+    | COMMENT  space
+    | EOL space {}
     ;
 Nspace: SPACE space
+    | COMMENT space
+    | EOL space {}
+    ;
+Espace: SPACE 
+    | COMMENT 
+    | EOL  {}
     ;
 
 %%
-void yyerror(std::string s){
-
-    std::cout<<"error: "<<s<<std::endl;
-
-
-}
