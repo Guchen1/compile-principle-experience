@@ -2,15 +2,18 @@
 #define EXPOPERATE_H
 #include <string>
 #include <cstdio>
+#include <cstdlib>
+#include <iostream>
 #include <windows.h>
 using namespace std;
+extern const string python;
 class expoperate
 {
 private:
     string expression;
     string commandmain = string("from math import *;print(eval('" + expression + "')");
-    string head = "set PYTHONHOME=C:/Users/10237/AppData/Local/Programs/Python/Python310/";
-    string subhead = "&&C:/Users/10237/AppData/Local/Programs/Python/Python310/python -c";
+    string head = "set PYTHONHOME=" + python;
+    string subhead = "&&python -c";
     string cmdLine;
 
 public:

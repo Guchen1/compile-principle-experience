@@ -14,6 +14,27 @@ double originx, originy, rotate, scalex = 1, scaley = 1;
 extern string s;
 extern FILE *yyin;
 string subreplace(string resource_str, string sub_str, string new_str);
+string getpython()
+{
+    FILE *pf = NULL;
+    pf = _popen("where python", "r");
+    if (NULL == pf)
+    {
+        printf("open pipe failed");
+        return 0;
+    }
+    char buffer[1024] = {'\0'};
+    std::string ret;
+    while (fgets(buffer, sizeof(buffer), pf))
+    {
+        ret += buffer;
+    }
+    _pclose(pf);
+    string a = ret;
+    a = a.substr(0, a.find('\n'));
+    return a;
+}
+const string python = subreplace(getpython().substr(0, getpython().length() - 10), "\\", "/");
 void draw(string a, string b, string c, string d, string e)
 {
 
@@ -44,7 +65,6 @@ void yyerror(std::string s)
 }
 int main()
 {
-    yyin = fopen("1.txt", "r");
     yyparse();
     cin.get();
 }
