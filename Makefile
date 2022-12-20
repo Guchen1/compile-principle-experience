@@ -5,6 +5,4 @@ test:
 	cd build&g++ ../src/process.cpp -o process.exe
 	cd build& process.exe 
 	cd build&flex  --outfile=a.yy.cc  ../src/test.l 
-	cd build&g++  -g -o test.exe a.tab.cc a.yy.cc ../src/test.cpp
-
-
+	cd build&g++ -IC:/Users/10237/AppData/Local/Programs/Python/Python310/include/    -I C:/Users/10237/AppData/Local/Programs/Python/Python310/Lib/site-packages/~umpy/core/include  -g C:/Users/10237/AppData/Local/Programs/Python/Python310/python310.dll -o test.exe a.tab.cc a.yy.cc ../src/test.cpp

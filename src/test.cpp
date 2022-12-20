@@ -1,5 +1,3 @@
-#define _CRT_STDIO_ISO_WIDE_SPECIFIERS
-#define MGL_STATIC_DEFINE
 #include <iostream>
 #include "expoperate.hpp"
 #include <cstdio>
@@ -8,8 +6,9 @@
 #include <thread>
 #include <map>
 #include <mutex>
-#include <mgl2/mgl.h>
+#include "matplotlibcpp.h"
 std::mutex some_mutex;
+namespace plt = matplotlibcpp;
 int process_count = 0;
 using namespace std;
 bool errflag = false;
@@ -55,6 +54,17 @@ void loop(int num, double i, string d, string e, map<int, pair<double, double>> 
     m.insert(pair<int, pair<double, double>>(num, pair<double, double>(x, y)));
     process_count--;
 }
+void drawthread(map<int, pair<double, double>> m)
+{
+    vector<double> x, y;
+    for (auto item : m)
+    {
+        x.push_back(item.second.first);
+        y.push_back(item.second.second);
+    }
+    plt::plot(x, y);
+    plt::pause(1);
+}
 void draw(string a, string b, string c, string d, string e)
 {
     map<int, pair<double, double>> m;
@@ -76,10 +86,9 @@ void draw(string a, string b, string c, string d, string e)
     {
         Sleep(10);
     }
-    for (auto item : m)
-    {
-        cout << item.second.first << " " << item.second.second << endl;
-    }
+    // thread t(drawthread, m);
+    // t.detach();
+    drawthread(m);
 }
 string subreplace(string resource_str, string sub_str, string new_str)
 {
@@ -101,6 +110,7 @@ void yyerror(std::string s)
 }
 int main()
 {
+    plt::ion();
     yyparse();
     cin.get();
 }
