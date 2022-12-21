@@ -2,6 +2,7 @@
 #include "expoperate.hpp"
 #include <cstdio>
 #include <string>
+#include "universal.hpp"
 #include <windows.h>
 #include <thread>
 #include <map>
@@ -12,44 +13,17 @@ namespace plt = matplotlibcpp;
 int process_count = 0;
 using namespace std;
 bool errflag = false;
+bool filemode = false;
 extern int words, chars, lines, a;
 extern int yyparse(void);
 double originx, originy, rotate, scalex = 1, scaley = 1;
 extern string s;
 extern FILE *yyin;
-string subreplace(string resource_str, string sub_str, string new_str);
-string getpython()
-{
-    FILE *pf = NULL;
-    pf = _popen("which python", "r");
-    if (NULL == pf)
-    {
-        printf("open pipe failed");
-        return 0;
-    }
-    char buffer[1024] = {'\0'};
-    std::string ret;
-    while (fgets(buffer, sizeof(buffer), pf))
-    {
-        ret += buffer;
-    }
-    _pclose(pf);
-    string a = ret;
-    if (a == "")
-    {
-        system("cls");
-        cout << "No python found!";
-        cin.get();
-        exit(1);
-    }
-    a = a.substr(0, a.find('\n'));
-    return a;
-}
-const string python = subreplace(getpython().substr(0, getpython().length() - 10), "\\", "/");
+
 void loop(int num, double i, string d, string e, map<int, pair<double, double>> &m, int &flag)
 {
-    double x = expoperate(subreplace(d, "T", std::to_string(i))).getresult() + originx;
-    double y = expoperate(subreplace(e, "T", std::to_string(i))).getresult() + originy;
+    double x = (expoperate(subreplace(d, "T", std::to_string(i))).getresult()) * scalex + originx;
+    double y = (expoperate(subreplace(e, "T", std::to_string(i))).getresult()) * scaley + originy;
     std::lock_guard<std::mutex> guard(some_mutex);
     m.insert(pair<int, pair<double, double>>(num, pair<double, double>(x, y)));
     process_count--;
@@ -63,7 +37,21 @@ void drawthread(map<int, pair<double, double>> m)
         y.push_back(item.second.second);
     }
     plt::plot(x, y);
-    plt::pause(1);
+    plt::pause(0.1);
+}
+void sleep(double a)
+{
+    plt::pause(a);
+    cout << "OK" << endl;
+}
+void clear()
+{
+    plt::clf();
+    plt::pause(0.1);
+    plt::ioff();
+    plt::pause(0.1);
+    plt::ion();
+    std::cout << "OK,clear the draw" << std::endl;
 }
 void draw(string a, string b, string c, string d, string e)
 {
@@ -90,16 +78,7 @@ void draw(string a, string b, string c, string d, string e)
     // t.detach();
     drawthread(m);
 }
-string subreplace(string resource_str, string sub_str, string new_str)
-{
-    string dst_str = resource_str;
-    int pos = 0;
-    while ((pos = dst_str.find(sub_str)) != std::string::npos) // 替换所有指定子串
-    {
-        dst_str.replace(pos, sub_str.length(), new_str);
-    }
-    return dst_str;
-}
+
 void yyerror(std::string s)
 {
     string xx;

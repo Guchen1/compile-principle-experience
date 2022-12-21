@@ -7,6 +7,8 @@
     #include <cmath>
     #include "../src/expoperate.hpp"
     using std::string;
+    extern void clear(void);
+    extern void sleep(double time);
     extern int yylex (void);
     extern bool errflag;
     extern double originx, originy, rotate, scalex, scaley ;
@@ -41,6 +43,8 @@
 %token PI
 %token E
 %token ERRORN
+%token CLEAR
+%token SLEEP
 %type   EXP FACTOR
 
 %%
@@ -53,6 +57,8 @@ statement:
     | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { scalex=stod($7);scaley=stod($11); std::cout<<"OK,the scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
     | ROT Nspace IS Nspace EXP space SEMICOLON  { rotate=stod($5); std::cout<<"OK,the rotate is now "<<rotate<<std::endl;}
     | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  SEMICOLON {draw($7,$11,$15,$21,$25);}
+    | SLEEP Nspace EXP space SEMICOLON {sleep(stod($3));}
+    | CLEAR space SEMICOLON {clear();}
     ;
 EXP: FACTOR
     | EXP PLUS FACTOR  {$$=std::to_string(stod($1)+stod($3));}
