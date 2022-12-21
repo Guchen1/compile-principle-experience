@@ -90,6 +90,7 @@ void yyerror(std::string s)
 int main()
 {
     plt::ion();
+    cout << "Loaded,welcome to use the program" << endl;
     yyparse();
     cin.get();
 }
