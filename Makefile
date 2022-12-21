@@ -7,4 +7,4 @@ test:
 	cd build&g++ ../src/process.cpp -o process.exe
 	cd build& process.exe 
 	cd build&flex  --outfile=a.yy.cc  ../src/test.l 
-	cd build&g++ -I$(PYTHON_PATH)/include/ -DPYTHON=$(PYTHON_VERSION)    -I $(PYTHON_PATH)/Lib/site-packages/~umpy/core/include  -g -o test.exe $(PYTHON_PATH)/python3$(PYTHON_VERSION).dll a.tab.cc a.yy.cc ../src/test.cpp
+	cd build&g++ -I../src -I../thirdparty -I$(PYTHON_PATH)/include/ -DPYTHON=$(PYTHON_VERSION)    -I $(PYTHON_PATH)/Lib/site-packages/~umpy/core/include  -g -o test.exe $(PYTHON_PATH)/python3$(PYTHON_VERSION).dll a.tab.cc a.yy.cc ../src/test.cpp

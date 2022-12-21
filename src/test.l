@@ -2,7 +2,6 @@
 %option batch
 %option case-insensitive
 %{
-    #include "../src/expoperate.hpp"
     #include<iostream>
     #include"type.h"
     extern std::string yylval;
@@ -14,6 +13,7 @@
     int lines=0;
 
 %}
+digit [0-9]
 %%
 origin    { return ORIGIN;}
 scale     {return SCALE;}
@@ -26,6 +26,13 @@ step      {return STEP;}
 draw      {return DRAW;}
 sleep     {if(!filemode)return SLEEP;}
 clear   {if(!filemode)return CLEAR;}
+sin      {return SIN;}
+cos      {return COS;}
+tan      {return TAN;}
+exp      {return EXPF;}
+ln       {return LN;}
+pi       {return PI;}
+e        {return E;}
 \+         {return PLUS;}
 \-         {return MINUS;}
 \*         {return MULTIPLY;}
@@ -37,7 +44,7 @@ clear   {if(!filemode)return CLEAR;}
 ","             {return COMMA;}
 ("//"|"--")+.*    {return COMMENT;}//ignore comments
 T       {yylval=yytext;return T;}
-[0-9]+    {yylval=yytext;return NUMBER;}
+{digit}+("."{digit}*)?    {yylval=yytext;return NUMBER;}
 \n        {errflag=false;return EOL;}
 " "     {return SPACE;}
 <<EOF>>   {return YYEOF;}

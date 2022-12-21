@@ -181,9 +181,6 @@ namespace matplotlibcpp
 #else
                 char name[] = "plotting";
 #endif
-                Py_SetProgramName(name);
-                Py_SetPythonHome(Str2Wstr(python).c_str());
-                Py_Initialize();
 
                 wchar_t const *dummy_args[] = {L"Python", NULL}; // const is needed because literals must not be modified
                 wchar_t const **argv = dummy_args;

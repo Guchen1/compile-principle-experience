@@ -1,32 +1,33 @@
 #include <iostream>
-#include "expoperate.hpp"
+#include <windows.h>
 #include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <string>
 #include "universal.hpp"
-#include <windows.h>
 #include <thread>
 #include <map>
 #include <mutex>
 #include "matplotlibcpp.h"
 std::mutex some_mutex;
 namespace plt = matplotlibcpp;
-int process_count = 0;
-using namespace std;
+bool errflagx = false;
 bool errflag = false;
 bool filemode = false;
 extern int words, chars, lines, a;
 extern int yyparse(void);
-double originx, originy, rotate, scalex = 1, scaley = 1;
+double originx, originy, rotatenum, scalex = 1, scaley = 1;
 extern string s;
 extern FILE *yyin;
-
+int countp = 1;
 void loop(int num, double i, string d, string e, map<int, pair<double, double>> &m, int &flag)
 {
-    double x = (expoperate(subreplace(d, "T", std::to_string(i))).getresult()) * scalex + originx;
-    double y = (expoperate(subreplace(e, "T", std::to_string(i))).getresult()) * scaley + originy;
-    std::lock_guard<std::mutex> guard(some_mutex);
+
+    double rawx = eval_fromPython(subreplace(subreplace(to_lowercase(d), "t", to_string(i)), "ln", "log"));
+    double rawy = eval_fromPython(subreplace(subreplace(to_lowercase(e), "t", to_string(i)), "ln", "log"));
+    double x = (rawx * cos(rotatenum) + rawy * sin(rotatenum)) * scalex + originx;
+    double y = (rawy * cos(rotatenum) - rawx * sin(rotatenum)) * scaley + originy;
     m.insert(pair<int, pair<double, double>>(num, pair<double, double>(x, y)));
-    process_count--;
 }
 void drawthread(map<int, pair<double, double>> m)
 {
@@ -36,7 +37,8 @@ void drawthread(map<int, pair<double, double>> m)
         x.push_back(item.second.first);
         y.push_back(item.second.second);
     }
-    plt::plot(x, y);
+    plt::plot(x, y, {{"label", "line" + to_string(countp++)}});
+    plt::legend();
     plt::pause(0.1);
 }
 void sleep(double a)
@@ -51,32 +53,53 @@ void clear()
     plt::ioff();
     plt::pause(0.1);
     plt::ion();
+    countp = 1;
     std::cout << "OK,clear the draw" << std::endl;
 }
 void draw(string a, string b, string c, string d, string e)
 {
     map<int, pair<double, double>> m;
-    int num = 0;
     int flag = 1;
-    cout << "Waiting..." << endl;
-    for (double i = stod(a); i <= stod(b); i += stod(c))
+    int num = 0;
+    // 检查是否为死循环
+    double da = stod(a), db = stod(b), dc = stod(c);
+    if (dc == 0)
     {
-        while (process_count > 50)
-        {
-            Sleep(1);
-        }
-        thread t(loop, num, i, d, e, std::ref(m), std::ref(flag));
-        t.detach();
-        process_count++;
-        num++;
+        cout << "Error:the step is 0" << endl;
+        return;
     }
-    while (m.size() != num)
+    if (da > db)
     {
-        Sleep(10);
+        if (dc > 0)
+        {
+            cout << "Error:the step is wrong" << endl;
+            return;
+        }
+    }
+    else
+    {
+        if (dc < 0)
+        {
+            cout << "Error:the step is wrong" << endl;
+            return;
+        }
+    }
+    cout << "Waiting..." << endl;
+    for (double i = da; i <= db; i += dc)
+    {
+        loop(num, i, d, e, m, flag);
+        if (errflagx)
+        {
+            errflagx = false;
+            cout << 1;
+            return;
+        }
+        num++;
     }
     // thread t(drawthread, m);
     // t.detach();
     drawthread(m);
+    cout << "OK" << endl;
 }
 
 void yyerror(std::string s)
@@ -89,6 +112,10 @@ void yyerror(std::string s)
 }
 int main()
 {
+    Py_SetPythonHome(Str2Wstr(python).c_str());
+    Py_Initialize();
+    dess = PyModule_GetDict(PyImport_AddModule("__main__"));
+    PyRun_SimpleString("from math import *");
     plt::ion();
     cout << "Loaded,welcome to use the program" << endl;
     yyparse();

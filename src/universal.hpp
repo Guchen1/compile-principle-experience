@@ -3,8 +3,14 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
+#include "Python.h"
 using namespace std;
 char buffer[100000];
+extern const string python;
+extern bool errflagx;
+PyObject *dess;
 bool checkversion(string path)
 {
     FILE *pf = NULL;
@@ -120,6 +126,39 @@ wstring Str2Wstr(string str)
     std::wstring wstr;
     wstr.assign(str.begin(), str.end());
     return wstr;
+}
+double eval_fromPython(string x)
+{
+    try
+    {
+
+        PyObject *result = PyRun_String(x.c_str(), Py_eval_input, dess, dess);
+        if (result == NULL)
+        {
+            PyErr_Clear();
+            throw exception();
+        }
+        double res = PyFloat_AsDouble(result);
+        return res;
+    }
+    catch (exception e)
+    {
+        cout << "Error:may exceed the numeric limit" << endl;
+        errflagx = true;
+        return 0;
+    }
+    // 调用，获取返回值
+}
+string to_lowercase(string str)
+{
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (str[i] >= 'A' && str[i] <= 'Z')
+        {
+            str[i] += 32;
+        }
+    }
+    return str;
 }
 auto temp = getpython();
 const string python = subreplace(temp.substr(0, temp.length() - 10), "\\", "/");
