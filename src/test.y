@@ -11,6 +11,8 @@
     extern void sleep(double time);
     extern int yylex (void);
     extern bool errflag;
+    extern void setscale(string a, string b);
+    extern void setscale(void);
     extern double originx, originy, rotatenum, scalex, scaley ;
     extern void draw(string start, string end, string step, string x, string y);
     void yyerror(std::string s);
@@ -51,6 +53,7 @@
 %token EXIT
 %token EXPF
 %token LN
+%token AUTO
 
 %%
 end:                    {errflag=false;}
@@ -58,13 +61,15 @@ end:                    {errflag=false;}
     | Espace end {}
     ;
 statement:
-      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON   { originx=stod($7);originy=stod($11);if(!filemode)std::cout<<"OK,the origin is now ("<<originx<<","<<originy<<")"<<std::endl;}
-    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { scalex=stod($7);scaley=stod($11);if(!filemode) std::cout<<"OK,the scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
-    | ROT Nspace IS Nspace EXP space SEMICOLON  { rotatenum=stod($5); if(!filemode)std::cout<<"OK,the rotate is now "<<rotatenum<<std::endl;}
+      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON   { originx=stod($7);originy=stod($11);if(!filemode)std::cout<<"OK, origin is now ("<<originx<<","<<originy<<")"<<std::endl;}
+    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { setscale($7,$11); if(!filemode) std::cout<<"OK, scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
+    | SCALE Nspace IS Nspace   AUTO space SEMICOLON  { setscale(); if(!filemode) std::cout<<"OK, scale is now auto-decided"<<std::endl;}
+    | ROT Nspace IS Nspace EXP space SEMICOLON  { rotatenum=stod($5); if(!filemode)std::cout<<"OK, rotate is now "<<rotatenum<<std::endl;}
     | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  SEMICOLON {draw($7,$11,$15,$21,$25);}
     | SLEEP Nspace EXP space SEMICOLON {sleep(stod($3));}
     | CLEAR space SEMICOLON {clear();}
     | EXIT space SEMICOLON {return 0;}
+    | SEMICOLON {}
     ;
 EXP: FACTOR
     | EXP PLUS FACTOR  {$$=std::to_string(stod($1)+stod($3));}

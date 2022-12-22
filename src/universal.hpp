@@ -94,7 +94,10 @@ string getpython()
     }
     while (a.find('\n') != -1)
     {
-        pythonpaths.push_back(a.substr(0, a.find('\n')));
+        string xc = a.substr(0, a.find('\n'));
+        xc.insert(0, "\"");
+        xc.insert(xc.length(), "\"");
+        pythonpaths.push_back(xc);
         a = a.substr(a.find('\n') + 1);
     }
     for (auto a : pythonpaths)

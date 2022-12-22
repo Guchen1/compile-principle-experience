@@ -2200,7 +2200,10 @@ namespace matplotlibcpp
         detail::_interpreter::get();
 
         PyObject *args = PyTuple_New(1);
-        PyTuple_SetItem(args, 0, PyFloat_FromDouble(ratio));
+        if (ratio == 0)
+            PyTuple_SetItem(args, 0, PyString_FromString("auto"));
+        else
+            PyTuple_SetItem(args, 0, PyFloat_FromDouble(ratio));
         PyObject *kwargs = PyDict_New();
 
         PyObject *ax =

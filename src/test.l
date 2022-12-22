@@ -32,6 +32,7 @@ exp      {return EXPF;}
 ln       {return LN;}
 pi       {return PI;}
 e        {return E;}
+auto    {return AUTO;}
 \+         {return PLUS;}
 \-         {return MINUS;}
 \*         {return MULTIPLY;}

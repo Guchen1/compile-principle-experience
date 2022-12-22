@@ -24,9 +24,23 @@ void loop(int num, double i, string d, string e, map<int, pair<double, double>> 
 
     double rawx = eval_fromPython(subreplace(subreplace(to_lowercase(d), "t", to_string(i)), "ln", "log"));
     double rawy = eval_fromPython(subreplace(subreplace(to_lowercase(e), "t", to_string(i)), "ln", "log"));
-    double x = (rawx * cos(rotatenum) + rawy * sin(rotatenum)) * scalex + originx;
-    double y = (rawy * cos(rotatenum) - rawx * sin(rotatenum)) * scaley + originy;
+    double x = (rawx * cos(rotatenum) + rawy * sin(rotatenum)) + originx;
+    double y = (rawy * cos(rotatenum) - rawx * sin(rotatenum)) + originy;
     m.insert(pair<int, pair<double, double>>(num, pair<double, double>(x, y)));
+}
+void setscale(string a, string b)
+{
+    scalex = stod(a);
+    scaley = stod(b);
+    plt::set_aspect(scaley / scalex);
+    if (filemode == false)
+        plt::pause(0.5);
+}
+void setscale()
+{
+    plt::set_aspect(0);
+    if (filemode == false)
+        plt::pause(0.5);
 }
 void drawthread(map<int, pair<double, double>> m)
 {
@@ -44,14 +58,14 @@ void drawthread(map<int, pair<double, double>> m)
 void sleep(double a)
 {
     plt::pause(a);
-    cout << "OK" << endl;
+    cout << "Sleep OK" << endl;
 }
 void clear()
 {
     plt::clf();
-    plt::pause(0.25);
+    plt::pause(0.5);
     plt::ioff();
-    plt::pause(0.25);
+    plt::pause(0.5);
     plt::ion();
     countp = 1;
     std::cout << "OK,clear the draw" << std::endl;
@@ -96,17 +110,28 @@ void draw(string a, string b, string c, string d, string e)
             return;
         }
         num++;
+        if (i + dc > db && i < db)
+        {
+            loop(num, db, d, e, m, flag);
+            if (errflagx)
+            {
+                errflagx = false;
+                return;
+            }
+        }
+        num++;
     }
+
     // thread t(drawthread, m);
     // t.detach();
     drawthread(m);
     if (!filemode)
-        cout << "OK" << endl;
+        cout << "Drawing OK" << endl;
 }
 
 void yyerror(std::string s)
 {
-    s = subreplace(s, "ERRORN", "charactor");
+    s = subreplace(s, "ERRORN", "character");
     if (filemode)
     {
         cout << "Error:" << s << " at line " << yylineno << endl;
@@ -123,6 +148,7 @@ int main(int argc, char *argv[])
     Py_Initialize();
     dess = PyModule_GetDict(PyImport_AddModule("__main__"));
     PyRun_SimpleString("from math import *");
+    plt::set_aspect(scaley / scalex);
     if (argc == 2 || argc == 3)
     {
         filemode = true;
