@@ -11,6 +11,7 @@ char buffer[100000];
 extern const string python;
 extern bool errflagx;
 PyObject *dess;
+wstring Str2Wstr(string str);
 bool checkversion(string path)
 {
     FILE *pf = NULL;
@@ -38,28 +39,21 @@ bool checkversion(string path)
 }
 bool checkmatplotlib(string path)
 {
-    FILE *pf = NULL;
-    pf = _popen((path + " -m pip list").c_str(), "r");
-    if (NULL == pf)
+    Py_SetPythonHome(Str2Wstr(python).c_str());
+    Py_Initialize();
+    PyRun_SimpleString("import warnings");
+    PyRun_SimpleString("warnings.filterwarnings('ignore')");
+    PyRun_SimpleString("import imp");
+    PyRun_SimpleString("imp.find_module('matplotlib')");
+    if (PyErr_Occurred())
     {
-        printf("open pipe failed");
-        return 0;
-    }
-    memset(buffer, 0, sizeof(buffer));
-    std::string ret;
-    while (fgets(buffer, sizeof(buffer), pf))
-    {
-        ret += buffer;
-    }
-    _pclose(pf);
-    system("cls");
-    system("color 7");
-    if (ret.find("matplotlib") == -1)
-    {
+        PyErr_Clear();
+        Py_Finalize();
         return false;
     }
     else
     {
+        Py_Finalize();
         return true;
     }
 }
@@ -113,7 +107,6 @@ string getpython()
             }
         }
     }
-    system("cls");
     cout << string("No python3.") + to_string(PYTHON) + " found !";
     cin.get();
     exit(1);

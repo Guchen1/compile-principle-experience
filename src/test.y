@@ -6,6 +6,7 @@
     #include <iostream>
     #include <cmath>
     using std::string;
+    extern bool filemode;
     extern void clear(void);
     extern void sleep(double time);
     extern int yylex (void);
@@ -47,6 +48,7 @@
 %token SIN
 %token COS
 %token TAN
+%token EXIT
 %token EXPF
 %token LN
 
@@ -56,12 +58,13 @@ end:                    {errflag=false;}
     | Espace end {}
     ;
 statement:
-      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON   { originx=stod($7);originy=stod($11);std::cout<<"OK,the origin is now ("<<originx<<","<<originy<<")"<<std::endl;}
-    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { scalex=stod($7);scaley=stod($11); std::cout<<"OK,the scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
-    | ROT Nspace IS Nspace EXP space SEMICOLON  { rotatenum=stod($5); std::cout<<"OK,the rotate is now "<<rotatenum<<std::endl;}
+      ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON   { originx=stod($7);originy=stod($11);if(!filemode)std::cout<<"OK,the origin is now ("<<originx<<","<<originy<<")"<<std::endl;}
+    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { scalex=stod($7);scaley=stod($11);if(!filemode) std::cout<<"OK,the scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
+    | ROT Nspace IS Nspace EXP space SEMICOLON  { rotatenum=stod($5); if(!filemode)std::cout<<"OK,the rotate is now "<<rotatenum<<std::endl;}
     | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  SEMICOLON {draw($7,$11,$15,$21,$25);}
     | SLEEP Nspace EXP space SEMICOLON {sleep(stod($3));}
     | CLEAR space SEMICOLON {clear();}
+    | EXIT space SEMICOLON {return 0;}
     ;
 EXP: FACTOR
     | EXP PLUS FACTOR  {$$=std::to_string(stod($1)+stod($3));}

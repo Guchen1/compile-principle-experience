@@ -1,4 +1,5 @@
 %option noyywrap
+%option yylineno
 %option batch
 %option case-insensitive
 %{
@@ -8,9 +9,6 @@
     extern bool errflag;
     extern void yyerror(std::string s);
     extern bool filemode;
-    int chars=0;
-    int words=0;
-    int lines=0;
 
 %}
 digit [0-9]
@@ -24,8 +22,9 @@ from      {return FROM;}
 to        {return TO;}
 step      {return STEP;}
 draw      {return DRAW;}
-sleep     {if(!filemode)return SLEEP;}
-clear   {if(!filemode)return CLEAR;}
+sleep     {if(!filemode)return SLEEP;else return ERRORN;}
+clear   {if(!filemode)return CLEAR;else return ERRORN;}
+exit     {if(!filemode)return EXIT;else return ERRORN;}
 sin      {return SIN;}
 cos      {return COS;}
 tan      {return TAN;}

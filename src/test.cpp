@@ -11,13 +11,12 @@
 #include "matplotlibcpp.h"
 std::mutex some_mutex;
 namespace plt = matplotlibcpp;
+extern int yylineno;
 bool errflagx = false;
 bool errflag = false;
 bool filemode = false;
-extern int words, chars, lines, a;
 extern int yyparse(void);
 double originx, originy, rotatenum, scalex = 1, scaley = 1;
-extern string s;
 extern FILE *yyin;
 int countp = 1;
 void loop(int num, double i, string d, string e, map<int, pair<double, double>> &m, int &flag)
@@ -39,7 +38,8 @@ void drawthread(map<int, pair<double, double>> m)
     }
     plt::plot(x, y, {{"label", "line" + to_string(countp++)}});
     plt::legend();
-    plt::pause(0.1);
+    if (filemode == false)
+        plt::pause(0.5);
 }
 void sleep(double a)
 {
@@ -49,9 +49,9 @@ void sleep(double a)
 void clear()
 {
     plt::clf();
-    plt::pause(0.1);
+    plt::pause(0.25);
     plt::ioff();
-    plt::pause(0.1);
+    plt::pause(0.25);
     plt::ion();
     countp = 1;
     std::cout << "OK,clear the draw" << std::endl;
@@ -84,7 +84,8 @@ void draw(string a, string b, string c, string d, string e)
             return;
         }
     }
-    cout << "Waiting..." << endl;
+    if (filemode == false)
+        cout << "Waiting..." << endl;
     for (double i = da; i <= db; i += dc)
     {
         loop(num, i, d, e, m, flag);
@@ -99,25 +100,73 @@ void draw(string a, string b, string c, string d, string e)
     // thread t(drawthread, m);
     // t.detach();
     drawthread(m);
-    cout << "OK" << endl;
+    if (!filemode)
+        cout << "OK" << endl;
 }
 
 void yyerror(std::string s)
 {
-    string xx;
+    s = subreplace(s, "ERRORN", "charactor");
+    if (filemode)
+    {
+        cout << "Error:" << s << " at line " << yylineno << endl;
+        exit(0);
+    }
     if (errflag == false)
         std::cout << s << std::endl;
     errflag = true;
     yyparse();
 }
-int main()
+int main(int argc, char *argv[])
 {
     Py_SetPythonHome(Str2Wstr(python).c_str());
     Py_Initialize();
     dess = PyModule_GetDict(PyImport_AddModule("__main__"));
     PyRun_SimpleString("from math import *");
+    if (argc == 2 || argc == 3)
+    {
+        filemode = true;
+        auto files = fopen(argv[1], "r");
+        if (files == NULL)
+        {
+            cout << "Error:the file is not exist" << endl;
+            return 0;
+        }
+        yyin = files;
+        yyparse();
+        try
+        {
+            if (argc == 3)
+            {
+                plt::save(argv[2]);
+            }
+            else
+            {
+                string tempfile;
+                if (string(argv[1]).find(".") != string::npos)
+                    tempfile = string(argv[1]).substr(0, string(argv[1]).find("."));
+                else
+                    tempfile = string(argv[1]);
+                plt::save(tempfile + string(".png"));
+            }
+        }
+        catch (std::runtime_error e)
+        {
+            cout << "Error:unkown error when saving file" << endl;
+            return 0;
+        }
+        cout << "Success" << endl;
+        return 0;
+    }
+    if (argc > 3)
+    {
+        cout << "Error:too many arguments" << endl;
+        return 0;
+    }
     plt::ion();
     cout << "Loaded,welcome to use the program" << endl;
+    cout << "Tip: you can click save button on figure view to save the picture when Sleeping" << endl;
     yyparse();
-    cin.get();
+    cout << "Bye" << endl;
+    Sleep(1000);
 }
