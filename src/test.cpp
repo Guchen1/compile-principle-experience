@@ -138,7 +138,7 @@ void yyerror(std::string s)
         exit(0);
     }
     if (errflag == false)
-        std::cout << s << std::endl;
+        std::cout << "Error:" << s << std::endl;
     errflag = true;
     yyparse();
 }

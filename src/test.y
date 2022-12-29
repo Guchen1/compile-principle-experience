@@ -62,7 +62,7 @@ end:                    {errflag=false;}
     ;
 statement:
       ORIGIN Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON   { originx=stod($7);originy=stod($11);if(!filemode)std::cout<<"OK, origin is now ("<<originx<<","<<originy<<")"<<std::endl;}
-    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { setscale($7,$11); if(!filemode) std::cout<<"OK, scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
+    | SCALE Nspace IS Nspace LPAREN space  EXP space  COMMA space  EXP space  RPAREN space SEMICOLON  { if(std::stod($7)>0&&std::stod($11)>0) setscale($7,$11); else if(!filemode) std::cout<<"Error: Scale can not be below zero"; if(!filemode) std::cout<<"OK, scale is now ("<<scalex<<","<<scaley<<")"<<std::endl;}
     | SCALE Nspace IS Nspace   AUTO space SEMICOLON  { setscale(); if(!filemode) std::cout<<"OK, scale is now auto-decided"<<std::endl;}
     | ROT Nspace IS Nspace EXP space SEMICOLON  { rotatenum=stod($5); if(!filemode)std::cout<<"OK, rotate is now "<<rotatenum<<std::endl;}
     | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  SEMICOLON {draw($7,$11,$15,$21,$25);}
