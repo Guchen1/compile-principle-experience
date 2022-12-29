@@ -1,0 +1,46 @@
+toolchain("mac") {
+  tool("cxx") {
+    command = "clang++ {{cflags}} -c {{source}} -o {{output}}"
+    outputs = [ "{{target_output_name}}.o" ]
+  }
+  tool("link") {
+    exe_name = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
+    command = "clang++ {{ldflags}} {{inputs}} -o $exe_name"
+    outputs = [ "$exe_name" ]
+  }
+}
+toolchain("mingw") {
+  tool("cxx") {
+    command = "g++ {{cflags}} -c {{source}} -o {{output}}"
+    description = "COMPILE {{target_output_name}}.obj"
+    outputs = [ "{{target_output_name}}.obj" ]
+  }
+  tool("link") {
+    outfile = "{{target_output_name}}{{output_extension}}"
+    rspfile = "$outfile.rsp"
+    command = "g++ {{ldflags}} -o $outfile -Wl,--start-group @$rspfile  {{solibs}} -Wl,--end-group {{libs}}"
+    description = "LINK $outfile"
+    default_output_dir = "{{root_out_dir}}"
+    rspfile_content = "{{inputs}}"
+    outputs = [ outfile ]
+  }
+  tool("stamp") {
+    command = "touch {{output}}"
+  }
+}
+
+toolchain("linux") {
+  tool("cxx") {
+    command = "g++ {{cflags}} -c {{source}} -o {{output}}"
+    outputs = [ "{{target_output_name}}.o" ]
+  }
+  tool("link") {
+    outfile = "{{target_output_name}}{{output_extension}}"
+    rspfile = "$outfile.rsp"
+    command = "g++ {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
+    description = "LINK $outfile"
+    default_output_dir = "{{root_out_dir}}"
+    rspfile_content = "{{inputs}}"
+    outputs = [ outfile ]
+  }
+}

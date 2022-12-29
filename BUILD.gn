@@ -1,0 +1,77 @@
+PYTHON_VERSION = 10
+PYTHON_PATH = "C:/Users/10237/AppData/Local/Programs/Python/Python310"
+executable("process") {
+  sources = [ "//src/process.cpp" ]
+  configs = [ ":executable_ldconfig" ]
+}
+source_set("draw") {
+  sources = [ "//src/test.cpp" ]
+  configs = [ ":executable_ldconfig" ]
+  output_name = "draw"
+  output_dir = "$root_build_dir"
+  deps = [ ":flexandbison" ]
+}
+source_set("bison") {
+  sources = [ "$root_build_dir/bison.tab.cc" ]
+  configs = [ ":executable_ldconfig" ]
+  output_name = "bison"
+  output_dir = "$root_build_dir"
+  deps = [
+    ":draw",
+    ":flexandbison",
+  ]
+}
+source_set("flex") {
+  sources = [ "$root_build_dir/flex.yy.cc" ]
+  configs = [ ":executable_ldconfig" ]
+  output_name = "flex"
+  output_dir = "$root_build_dir"
+  deps = [
+    ":bison",
+    ":flexandbison",
+  ]
+}
+print(root_build_dir)
+executable("main") {
+  configs = [
+    ":executable_ldconfig",
+    ":add",
+  ]
+  output_name = "main"
+  deps = [
+    ":bison",
+    ":draw",
+    ":flex",
+  ]
+}
+action("flexandbison") {
+  script = "//generate.py"
+  outputs = [
+    "$root_build_dir/bison.tab.cc",
+    "$root_build_dir/flex.yy.cc",
+    "$root_build_dir/type.h",
+  ]
+  deps = [ ":process" ]
+}
+
+src_paths = rebase_path("//src", root_build_dir)
+thirdparty_paths = rebase_path("//thirdparty", root_build_dir)
+config("executable_ldconfig") {
+  ldflags = [
+    "-Wl,-rpath=\$ORIGIN/",
+    "-Wl,-rpath-link=",
+  ]
+  cflags = [
+    "-I$src_paths",
+    "-I$thirdparty_paths",
+    "-I$PYTHON_PATH/include/",
+    "-DPYTHON=$PYTHON_VERSION",
+    "-I$PYTHON_PATH/Lib/site-packages/~umpy/core/include",
+  ]
+}
+config("add") {
+  ldflags = [
+    "-L$PYTHON_PATH",
+    "-lpython3$PYTHON_VERSION",
+  ]
+}

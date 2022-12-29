@@ -1,12 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include<string>
+#include <string>
 using namespace std;
 int main()
 {
-    fstream in("a.tab.cc", ios::in);
-    fstream out("type.h",ios::out);
+    fstream in("bison.tab.cc", ios::in);
+    fstream out("type.h", ios::out);
     vector<string> lines;
     string temp;
     std::vector<std::string>::iterator startp, endp;
@@ -26,14 +26,16 @@ int main()
         }
         else if (find)
         {
-            if(i->find("};")!=-1){
-                endp=i;
+            if (i->find("};") != -1)
+            {
+                endp = i;
                 break;
             }
         }
     }
-    for(auto i = startp; i <=endp; i++){
-        i->erase(0,2);
-        out<<*i<<endl;
+    for (auto i = startp; i <= endp; i++)
+    {
+        i->erase(0, 2);
+        out << *i << endl;
     }
 }

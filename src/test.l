@@ -9,7 +9,6 @@
     extern bool errflag;
     extern void yyerror(std::string s);
     extern bool filemode;
-
 %}
 digit [0-9]
 %%
