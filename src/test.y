@@ -15,45 +15,9 @@
     extern void setscale(void);
     extern double originx, originy, rotatenum, scalex, scaley ;
     extern void draw(string start, string end, string step, string x, string y);
-    void yyerror(std::string s);
+    extern void yyerror(std::string s);
 %}
-%token EOL
-%token NUMBER
-%token PLUS
-%token MINUS
-%token MULTIPLY
-%token DIVIDE
-%token POWER
-%token LPAREN
-%token RPAREN
-%token YEOF
-%token STRING
-%token ORIGIN
-%token SCALE
-%token ROT
-%token IS
-%token TO
-%token STEP
-%token DRAW
-%token FOR
-%token FROM
-%token COMMENT
-%token COMMA
-%token T
-%token SPACE
-%token SEMICOLON
-%token PI
-%token E
-%token ERRORN
-%token CLEAR
-%token SLEEP
-%token SIN
-%token COS
-%token TAN
-%token EXIT
-%token EXPF
-%token LN
-%token AUTO
+%token EOL NUMBER PLUS MINUS MULTIPLY DIVIDE POWER LPAREN RPAREN YEOF STRING ORIGIN SCALE ROT IS TO STEP DRAW FOR FROM COMMENT COMMA T SPACE SEMICOLON PI E ERRORN CLEAR SLEEP SIN COS TAN EXIT EXPF LN AUTO
 
 %%
 end:                    {errflag=false;}
