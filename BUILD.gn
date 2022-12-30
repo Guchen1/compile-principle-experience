@@ -1,5 +1,12 @@
 PYTHON_VERSION = 10
 PYTHON_PATH = "C:/Users/10237/AppData/Local/Programs/Python/Python310"
+if (target_os == "linux") {
+  li = "-lpython3.$PYTHON_VERSION"
+} else if (target_os == "mac") {
+  li = "-lpython3.$PYTHON_VERSION"
+} else if (target_os == "windows") {
+  li = "-lpython3$PYTHON_VERSION"
+}
 executable("process") {
   sources = [ "//src/process.cpp" ]
   configs = [ ":executable_ldconfig" ]
@@ -67,11 +74,13 @@ config("executable_ldconfig") {
     "-I$PYTHON_PATH/include/",
     "-DPYTHON=$PYTHON_VERSION",
     "-I$PYTHON_PATH/Lib/site-packages/~umpy/core/include",
+    "-I/usr/include/python3.$PYTHON_VERSION/",
+    "-I/usr/lib/python3.$PYTHON_VERSION/site-packages/numpy/core/include/",
   ]
 }
 config("add") {
   ldflags = [
     "-L$PYTHON_PATH",
-    "-lpython3$PYTHON_VERSION",
+    "$li",
   ]
 }

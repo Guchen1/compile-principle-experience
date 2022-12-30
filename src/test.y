@@ -8,7 +8,7 @@
     using std::string;
     extern bool filemode;
     extern void clear(void);
-    extern void sleep(double time);
+    extern void sleepx(double time);
     extern int yylex (void);
     extern bool errflag;
     extern void setscale(string a, string b);
@@ -30,7 +30,7 @@ statement:
     | SCALE Nspace IS Nspace   AUTO space SEMICOLON  { setscale(); if(!filemode) std::cout<<"OK, scale is now auto-decided"<<std::endl;}
     | ROT Nspace IS Nspace EXP space SEMICOLON  { rotatenum=stod($5); if(!filemode)std::cout<<"OK, rotate is now "<<rotatenum<<std::endl;}
     | FOR Nspace T Nspace FROM Nspace EXP Nspace TO Nspace EXP Nspace STEP Nspace EXP Nspace DRAW space LPAREN space  TEXP space  COMMA space  TEXP space  RPAREN space  SEMICOLON {draw($7,$11,$15,$21,$25);}
-    | SLEEP Nspace EXP space SEMICOLON {sleep(stod($3));}
+    | SLEEP Nspace EXP space SEMICOLON {sleepx(stod($3));}
     | CLEAR space SEMICOLON {clear();}
     | EXIT space SEMICOLON {return 0;}
     | SEMICOLON {}

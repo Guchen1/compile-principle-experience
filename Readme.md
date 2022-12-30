@@ -1,4 +1,4 @@
-# Draw Language (Now windows only)
+# Draw Language (Now windows and Linux)
 
 ## About the project
 
@@ -49,6 +49,7 @@ This is a homework which implements a language. The language is for drawing.
 ## How to use
 
 1. Install all the requirements on your computer.
-2. Change the `PYTHON` and `PYTHON_VERSION` variable in the `Makefile` to your python path and subversion.
-3. Run `make` in the root directory of the project.
-4. Run `./build/draw` to start interactive mode or `./build/draw <sourcefile> [targetfile]` to run a file.
+2. Change the `PYTHON_PATH`(ONLY NEEDED ON WINDOWS) , `TARGET` and `PYTHON_VERSION` variable in the `BUILD.gn` to your python path and subversion.
+3. Run `gn gen out/Default --args=target_os=\"linux\"` in the root directory of the project.
+4. Run `ninja -C out/Default` to compile it.
+5. Run `./out/Default/main` to start interactive mode or `./out/Default/main <sourcefile> [targetfile]` to run a file.

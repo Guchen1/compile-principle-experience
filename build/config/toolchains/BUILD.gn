@@ -9,9 +9,9 @@ toolchain("mac") {
     outputs = [ "$exe_name" ]
   }
 }
-toolchain("mingw") {
+toolchain("windows") {
   tool("cxx") {
-    command = "g++ {{cflags}} -c {{source}} -o {{output}}"
+    command = "g++ {{cflags}} -D_WIN -c {{source}} -o {{output}}"
     description = "COMPILE {{target_output_name}}.obj"
     outputs = [ "{{target_output_name}}.obj" ]
   }
@@ -42,5 +42,8 @@ toolchain("linux") {
     default_output_dir = "{{root_out_dir}}"
     rspfile_content = "{{inputs}}"
     outputs = [ outfile ]
+  }
+  tool("stamp") {
+    command = "touch {{output}}"
   }
 }

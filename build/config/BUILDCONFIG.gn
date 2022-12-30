@@ -1,1 +1,1 @@
-set_default_toolchain("//build/config/toolchains:mingw")
+set_default_toolchain("//build/config/toolchains:$target_os")

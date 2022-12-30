@@ -15,7 +15,11 @@ wstring Str2Wstr(string str);
 bool checkversion(string path)
 {
     FILE *pf = NULL;
+#ifdef _WIN
     pf = _popen((path + " -V").c_str(), "r");
+#else
+    pf = popen((path + " -V").c_str(), "r");
+#endif
     if (NULL == pf)
     {
         printf("open pipe failed");
@@ -27,7 +31,11 @@ bool checkversion(string path)
     {
         ret += buffer;
     }
+#ifdef _WIN
     _pclose(pf);
+#else
+    pclose(pf);
+#endif
     if (ret.find(string("3.") + to_string(PYTHON)) != -1)
     {
         return true;
@@ -39,7 +47,9 @@ bool checkversion(string path)
 }
 bool checkmatplotlib(string path)
 {
+#ifdef _WIN
     Py_SetPythonHome(Str2Wstr(python).c_str());
+#endif
     Py_Initialize();
     PyRun_SimpleString("import warnings");
     PyRun_SimpleString("warnings.filterwarnings('ignore')");
@@ -71,7 +81,11 @@ string getpython()
 {
     vector<string> pythonpaths;
     FILE *pf = NULL;
+#ifdef _WIN
     pf = _popen("where python", "r");
+#else
+    pf = popen("which python", "r");
+#endif
     if (NULL == pf)
     {
         printf("open pipe failed");
@@ -83,11 +97,19 @@ string getpython()
     {
         ret += buffer;
     }
+#ifdef _WIN
     _pclose(pf);
+#else
+    pclose(pf);
+#endif
     string a = ret;
     if (a == "")
     {
+#ifdef _WIN
         system("cls");
+#else
+// system("clear");
+#endif
         cout << string("No python3.") + to_string(PYTHON) + " found !";
         cin.get();
         exit(1);
@@ -104,10 +126,7 @@ string getpython()
     {
         if (checkversion(a))
         {
-            if (checkmatplotlib(a))
-            {
-                return a;
-            }
+            return a;
         }
     }
     cout << string("No python3.") + to_string(PYTHON) + " found !";
@@ -157,5 +176,6 @@ string to_lowercase(string str)
     return str;
 }
 auto temp = getpython();
-const string python = subreplace(temp.substr(0, temp.length() - 10), "\\", "/");
+
+const string python = subreplace(temp.substr(0, temp.find_last_of('/')), "\\", "/");
 #endif

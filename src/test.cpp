@@ -1,5 +1,9 @@
 #include <iostream>
+#ifdef _WIN
 #include <windows.h>
+#else
+#include <unistd.h>
+#endif
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
@@ -55,7 +59,7 @@ void drawthread(map<int, pair<double, double>> m)
     if (filemode == false)
         plt::pause(0.5);
 }
-void sleep(double a)
+void sleepx(double a)
 {
     plt::pause(a);
     cout << "Sleep OK" << endl;
@@ -144,7 +148,10 @@ void yyerror(std::string s)
 }
 int main(int argc, char *argv[])
 {
+    checkmatplotlib(python);
+#ifdef _WIN32
     Py_SetPythonHome(Str2Wstr(python).c_str());
+#endif
     Py_Initialize();
     dess = PyModule_GetDict(PyImport_AddModule("__main__"));
     PyRun_SimpleString("from math import *");
@@ -194,5 +201,10 @@ int main(int argc, char *argv[])
     cout << "Tip: you can click save button on figure view to save the picture when Sleeping" << endl;
     yyparse();
     cout << "Bye" << endl;
+#ifdef _WIN32
     Sleep(1000);
+#else
+    sleep(1);
+#endif
+    Py_Finalize();
 }
