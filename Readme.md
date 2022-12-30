@@ -1,4 +1,4 @@
-# Draw Language (Now windows and Linux)
+# Draw Language (Now with windows and Linux support)
 
 ## About the project
 
@@ -6,7 +6,8 @@ This is a homework which implements a language. The language is for drawing.
 
 ## Requirements
 
-- make(in path)
+- gn(in path)
+- ninja(in path)
 - gcc(in path)
 - bison
 - flex
@@ -50,6 +51,6 @@ This is a homework which implements a language. The language is for drawing.
 
 1. Install all the requirements on your computer.
 2. Change the `PYTHON_PATH`(ONLY NEEDED ON WINDOWS) , `TARGET` and `PYTHON_VERSION` variable in the `BUILD.gn` to your python path and subversion.
-3. Run `gn gen out/Default --args=target_os=\"linux\"` in the root directory of the project.
+3. Run `gn gen out/Default --args=target_os=\"linux\"` or `gn gen out/Default --args=target_os="windows"` in the root directory of the project.
 4. Run `ninja -C out/Default` to compile it.
 5. Run `./out/Default/main` to start interactive mode or `./out/Default/main <sourcefile> [targetfile]` to run a file.
