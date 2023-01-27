@@ -1,5 +1,5 @@
 #include <iostream>
-#ifdef _WIN
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -148,13 +148,17 @@ void yyerror(std::string s)
 }
 int main(int argc, char *argv[])
 {
+
     checkmatplotlib(python);
 #ifdef _WIN32
-    Py_SetPythonHome(Str2Wstr(python).c_str());
+    // Py_SetPythonHome(Str2Wstr(python.substr(0, python.length() - 12)).c_str());
 #endif
     Py_Initialize();
     dess = PyModule_GetDict(PyImport_AddModule("__main__"));
     PyRun_SimpleString("from math import *");
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("import signal");
+    PyRun_SimpleString("signal.signal(signal.SIGINT,lambda x,y:0)");
     plt::set_aspect(scaley / scalex);
     if (argc == 2 || argc == 3)
     {
@@ -202,7 +206,7 @@ int main(int argc, char *argv[])
     yyparse();
     cout << "Bye" << endl;
 #ifdef _WIN32
-    Sleep(1000);
+    Sleep(1);
 #else
     sleep(1);
 #endif

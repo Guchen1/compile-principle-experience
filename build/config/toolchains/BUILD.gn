@@ -11,7 +11,7 @@ toolchain("mac") {
 }
 toolchain("windows") {
   tool("cxx") {
-    command = "g++ {{cflags}} -D_WIN -c {{source}} -o {{output}}"
+    command = "g++ {{cflags}} -D_WIN32 -c {{source}} -o {{output}}"
     description = "COMPILE {{target_output_name}}.obj"
     outputs = [ "{{target_output_name}}.obj" ]
   }

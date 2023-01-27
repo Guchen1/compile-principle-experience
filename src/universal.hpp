@@ -15,7 +15,7 @@ wstring Str2Wstr(string str);
 bool checkversion(string path)
 {
     FILE *pf = NULL;
-#ifdef _WIN
+#ifdef _WIN32
     pf = _popen((path + " -V").c_str(), "r");
 #else
     pf = popen((path + " -V").c_str(), "r");
@@ -31,7 +31,7 @@ bool checkversion(string path)
     {
         ret += buffer;
     }
-#ifdef _WIN
+#ifdef _WIN32
     _pclose(pf);
 #else
     pclose(pf);
@@ -47,8 +47,8 @@ bool checkversion(string path)
 }
 bool checkmatplotlib(string path)
 {
-#ifdef _WIN
-    Py_SetPythonHome(Str2Wstr(python).c_str());
+#ifdef _WIN32
+    // Py_SetPythonHome(Str2Wstr(python.substr(0, python.length() - 12)).c_str());
 #endif
     Py_Initialize();
     PyRun_SimpleString("import warnings");
@@ -81,7 +81,7 @@ string getpython()
 {
     vector<string> pythonpaths;
     FILE *pf = NULL;
-#ifdef _WIN
+#ifdef _WIN32
     pf = _popen("where python", "r");
 #else
     pf = popen("which python", "r");
@@ -97,7 +97,7 @@ string getpython()
     {
         ret += buffer;
     }
-#ifdef _WIN
+#ifdef _WIN32
     _pclose(pf);
 #else
     pclose(pf);
@@ -105,10 +105,10 @@ string getpython()
     string a = ret;
     if (a == "")
     {
-#ifdef _WIN
+#ifdef _WIN32
         system("cls");
 #else
-// system("clear");
+        system("clear");
 #endif
         cout << string("No python3.") + to_string(PYTHON) + " found !";
         cin.get();
